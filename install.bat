@@ -59,6 +59,6 @@ echo Cleaning up download cache...
 echo.
 echo ===================================================
 echo   INSTALLATION COMPLETE!
-echo   You can now run 'start.bat'.
+echo   You can now run 'start_FLUX2-KLEIN-4B_gui.bat'.
 echo ===================================================
 pause
