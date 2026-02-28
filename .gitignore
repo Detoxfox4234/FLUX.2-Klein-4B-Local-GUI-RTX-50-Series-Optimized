@@ -1,0 +1,21 @@
+# Python environment (portable, created by install.bat)
+python_env/
+
+# Model files (downloaded on first run)
+model_cache/
+
+# Generated images
+outputs/
+
+# Claude Code
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
