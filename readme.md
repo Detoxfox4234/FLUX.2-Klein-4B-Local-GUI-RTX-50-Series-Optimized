@@ -21,7 +21,7 @@ This project is specifically optimized for **NVIDIA RTX 50 Series** GPUs, utiliz
 * **📦 One‑Click Installer** – Includes a robust batch script for easy setup on Windows.
 * **📊 Live Hardware Monitor** – Real‑time dashboard to watch VRAM, RAM, and CPU usage while generating.
 * **📂 Auto‑Save** – Automatically creates an `outputs` folder and saves every generation with a timestamp.
-* **🛄 Portable** – Does not modify your Windows system. Everything stays contained in one folder.
+* **🛄 Portable** – Does not modify your Windows system. Everything stays contained in one folder, including the model files.
 
 ## 📋 Prerequisites
 
@@ -39,8 +39,9 @@ This project is specifically optimized for **NVIDIA RTX 50 Series** GPUs, utiliz
 ## 🖥️ Usage
 
 1. Double‑click `start_FLUX2‑KLEIN‑4B_gui.bat`.
-2. Wait for the model to load (first run downloads approximately 16GB).
-3. The GUI will open automatically in your browser (usually `http://127.0.0.1:7860`).
+2. On the **first run**, the model (~16GB) is downloaded directly into the `model_cache/` folder inside the project directory.
+3. On every **subsequent run**, the model loads instantly from the local cache — no internet connection required.
+4. The GUI will open automatically in your browser (usually `http://127.0.0.1:7860`).
 
 ## ⚙️ Recommended Settings for Klein
 
@@ -49,6 +50,21 @@ The Klein model is distilled, meaning it behaves differently than the base model
 * **Steps** – 4 steps is the sweet spot.
 * **Guidance Scale** – Leave at 1.0.
 * **Resolution** – 1024×1024 works best.
+
+## 📂 Folder Structure
+
+After installation and first run, your folder will look like this:
+
+```
+Flux2_KLEIN_4B/
+├── app.py                          # Main application
+├── install.bat                     # One-click installer
+├── start_FLUX2-KLEIN-4B_gui.bat    # Launch script
+├── requirements.txt                # Python dependencies
+├── python_env/                     # Isolated Python 3.11 (created by install.bat)
+├── model_cache/                    # FLUX.2 Klein model (~16GB, downloaded on first run)
+└── outputs/                        # Generated images (auto-created)
+```
 
 ## 🔧 Troubleshooting
 
