@@ -4,10 +4,11 @@ from diffusers import Flux2KleinPipeline
 import os
 import psutil
 import time
-from huggingface_hub import login
+from huggingface_hub import login, snapshot_download
 
 # --- CONFIGURATION ---
 MODEL_ID = "black-forest-labs/FLUX.2-klein-4B"
+LOCAL_MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_cache")
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -70,9 +71,13 @@ def get_system_stats():
 # --- LOAD MODEL ---
 def load_model():
     global pipe
-    print(f"⏳ Loading {MODEL_ID}...")
     try:
-        pipe = Flux2KleinPipeline.from_pretrained(MODEL_ID, torch_dtype=torch.bfloat16)
+        # Download directly into local folder (portable, no ~/.cache/huggingface used)
+        if not os.path.exists(os.path.join(LOCAL_MODEL_DIR, "model_index.json")):
+            print(f"⏳ Downloading {MODEL_ID} to {LOCAL_MODEL_DIR} (first time only)...")
+            snapshot_download(repo_id=MODEL_ID, local_dir=LOCAL_MODEL_DIR)
+        print(f"⏳ Loading model from {LOCAL_MODEL_DIR}...")
+        pipe = Flux2KleinPipeline.from_pretrained(LOCAL_MODEL_DIR, torch_dtype=torch.bfloat16)
         pipe.enable_model_cpu_offload()
         print("✅ Model loaded successfully!")
         return "Ready"
@@ -434,7 +439,7 @@ glass_theme = gr.themes.Base(
     slider_color_dark="#00C9FF",
 )
 
-with gr.Blocks(title="Flux.2 Klein GUI", theme=glass_theme) as demo:
+with gr.Blocks(title="Flux.2 Klein GUI") as demo:
     
     # --- HEADER ---
     with gr.Row(elem_classes="header-row"):
@@ -529,4 +534,4 @@ if __name__ == "__main__":
     # login(token="YOUR_TOKEN") # Optional hardcoded login
     load_model()
     # CSS passed here to avoid Gradio 6.0 warning
-    demo.launch(inbrowser=True, css=custom_css)
+    demo.launch(inbrowser=True, css=custom_css, theme=glass_theme)
