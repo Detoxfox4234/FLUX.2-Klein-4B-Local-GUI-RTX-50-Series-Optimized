@@ -27,6 +27,10 @@ This project is specifically optimized for **NVIDIA RTX 50 Series** GPUs, utiliz
 
 * **OS** – Windows 10/11
 * **GPU** – NVIDIA RTX 3090 / 4090 / 5090 (16GB+ VRAM recommended)
+* **Hugging Face Account** – FLUX.2 is a gated model. You need to:
+  1. Create a free account at [huggingface.co](https://huggingface.co).
+  2. Accept the model license at [FLUX.2-klein-4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B).
+  3. Generate an access token at [HF Tokens](https://huggingface.co/settings/tokens).
 
 ## 📥 Installation
 
@@ -34,7 +38,8 @@ This project is specifically optimized for **NVIDIA RTX 50 Series** GPUs, utiliz
 2. Double‑click `install.bat`.
    * The script automatically downloads an isolated Python 3.11 environment.
    * It installs PyTorch Nightly (required for Blackwell / RTX 50 Series support).
-3. Wait until the installation is complete.
+3. The script will ask you to log in to Hugging Face (required once to download the gated model).
+4. Wait until the installation is complete.
 
 ## 🖥️ Usage
 
@@ -68,6 +73,7 @@ Flux2_KLEIN_4B/
 
 ## 🔧 Troubleshooting
 
+* **401/403 Client Error** – You are not logged in or haven’t accepted the model license. Go to [FLUX.2-klein-4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) and accept the license, then re-run `install.bat` and log in again.
 * **OOM (Out of Memory)** – Ensure you don’t have other heavy GPU apps running. The app uses CPU offloading to save VRAM.
 
 ## 📄 License
