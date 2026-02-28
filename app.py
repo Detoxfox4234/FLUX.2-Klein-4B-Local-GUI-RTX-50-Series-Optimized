@@ -1,10 +1,11 @@
 import gradio as gr
 import torch
+import numpy as np
 from diffusers import Flux2KleinPipeline
 import os
 import psutil
 import time
-from huggingface_hub import login, snapshot_download
+from huggingface_hub import snapshot_download
 
 # --- CONFIGURATION ---
 MODEL_ID = "black-forest-labs/FLUX.2-klein-4B"
@@ -91,6 +92,11 @@ def generate_image(prompt, input_image, width, height, steps, guidance, seed, st
     if pipe is None:
         return None, "Error: Model not loaded!"
 
+    if not prompt or not prompt.strip():
+        return None, "Error: Please enter a prompt!"
+
+    width, height, steps = int(width), int(height), int(steps)
+
     if seed == -1 or seed is None:
         seed = torch.randint(0, 2**32, (1,)).item()
     generator = torch.Generator("cuda").manual_seed(int(seed))
@@ -103,10 +109,13 @@ def generate_image(prompt, input_image, width, height, steps, guidance, seed, st
     try:
         with torch.inference_mode():
             if input_image is not None:
-                # Image-to-Image Generation
+                # Image-to-Image: use strength to shorten the sigma schedule
+                full_sigmas = np.linspace(1.0, 1 / steps, steps)
+                start = int(round(steps * (1 - strength)))
+                sigmas = full_sigmas[start:]
                 image = pipe(
                     prompt=prompt, image=input_image, height=height, width=width,
-                    num_inference_steps=steps, guidance_scale=guidance,
+                    sigmas=sigmas.tolist(), num_inference_steps=steps, guidance_scale=guidance,
                     generator=generator, max_sequence_length=512
                 ).images[0]
             else:
@@ -119,11 +128,13 @@ def generate_image(prompt, input_image, width, height, steps, guidance, seed, st
 
         elapsed_time = time.time() - start_time
         timestamp = int(time.time())
-        image.save(f"{OUTPUT_DIR}/flux2_{timestamp}.png")
-        
+        image.save(f"{OUTPUT_DIR}/flux2_{timestamp}_{int(seed)}.png")
+        torch.cuda.empty_cache()
+
         return image, f"✅ Done! Seed: {seed} ({elapsed_time:.2f}s)"
-        
+
     except Exception as e:
+        torch.cuda.empty_cache()
         return None, f"❌ Error: {e}"
 
 # --- GUI CSS ---
@@ -531,7 +542,6 @@ with gr.Blocks(title="Flux.2 Klein GUI") as demo:
     shutdown_btn.click(shutdown_server)
 
 if __name__ == "__main__":
-    # login(token="YOUR_TOKEN") # Optional hardcoded login
     load_model()
     # CSS passed here to avoid Gradio 6.0 warning
     demo.launch(inbrowser=True, css=custom_css, theme=glass_theme)
